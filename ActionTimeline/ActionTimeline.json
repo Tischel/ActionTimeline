@@ -1,0 +1,9 @@
+﻿{
+  "Name": "ActionTimeline",
+  "Author": "Tischel",
+  "Punchline": "Show your actions in real-time.",
+  "Description": "Configurable timeline display of all the actions you use.",
+  "RepoUrl": "https://github.com/Tischel/ActionTimeline",
+  "Tags": [ "UI" ],
+  "Changelog": "0.1.0.0\n- First release."
+}
