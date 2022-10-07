@@ -141,6 +141,12 @@ namespace ActionTimeline.Helpers
         private Hook<OnCastDelegate>? _onCastHook;
 
         private ExcelSheet<LuminaAction>? _sheet;
+        private Dictionary<uint, uint> _specialCasesMap = new() { 
+            // SAM
+            [16484] = 7477, // kaeshi higanbana
+            [16485] = 7477, // kaeshi goken
+            [16486] = 7477, // keashi setsugekka
+        };
 
         private static int kMaxItemCount = 50;
         private List<TimelineItem> _items = new List<TimelineItem>(kMaxItemCount);
@@ -293,11 +299,19 @@ namespace ActionTimeline.Helpers
             // handle sprint and auto attack icons
             int iconId = actionId == 3 ? 104 : (actionId == 1 ? 101 : action.Icon);
 
+            // handle weird cases
+            uint id = actionId;
+            if (_specialCasesMap.TryGetValue(actionId, out uint replacedId))
+            {
+                type = TimelineItemType.Action;
+                id = replacedId;
+            }
+
             // calculate gcd and cast time
             if (type == TimelineItemType.CastStart)
             {
-                gcdDuration = GetGCDTime(actionId);
-                castTime = GetCastTime(actionId);
+                gcdDuration = GetGCDTime(id);
+                castTime = GetCastTime(id);
             }
             else if (type == TimelineItemType.Action)
             {
@@ -309,8 +323,8 @@ namespace ActionTimeline.Helpers
                 }
                 else
                 {
-                    gcdDuration = GetGCDTime(actionId);
-                    castTime = _hadSwiftcast ? 0 : GetCastTime(actionId);
+                    gcdDuration = GetGCDTime(id);
+                    castTime = _hadSwiftcast ? 0 : GetCastTime(id);
                 }
             }
 

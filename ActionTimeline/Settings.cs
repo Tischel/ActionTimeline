@@ -46,7 +46,7 @@ namespace ActionTimeline
         public float GCDClippingThreshold = 0.05f; // seconds
         public float GCDClippingCastsThreshold = 0.5f; // seconds
         public int GCDClippingMaxTime = 5; // seconds
-        public Vector4 GCDClippingColor = new Vector4(1f, 0.2f, 0.2f, 0.5f);
+        public Vector4 GCDClippingColor = new Vector4(1f, 0.2f, 0.2f, 0.3f);
 
         public bool ShowRotation = true;
         public bool RotationLocked = false;
