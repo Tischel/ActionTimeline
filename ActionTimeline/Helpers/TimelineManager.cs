@@ -54,7 +54,7 @@ namespace ActionTimeline.Helpers
 
     public struct GCDClipData
     {
-        public bool IsClipped{ get; }
+        public bool IsClipped { get; }
         public double StartTime { get; }
         public double? EndTime { get; }
         public bool IsFakeEndTime { get; }
@@ -194,25 +194,14 @@ namespace ActionTimeline.Helpers
                     }
 
                     // not clipped?
-                    if (gcdClipEnd.HasValue && Math.Abs(gcdClipEnd.Value - gcdClipStart) < Settings.GCDClippingThreshold)
+                    if (!isFakeEnd && gcdClipEnd.HasValue && Math.Abs(gcdClipEnd.Value - gcdClipStart) < Settings.GCDClippingThreshold)
                     {
                         item.gcdClipData = new GCDClipData(false, 0, 0, false);
                     }
                     // clipped :(
                     else
                     {
-                        //if (gcdClipEnd.HasValue)
-                        //{
-                        //    PluginLog.Log("id        : " + i);
-                        //    PluginLog.Log("time      : " + item.Time);
-                        //    PluginLog.Log("gcd       : " + item.GCDDuration);
-                        //    PluginLog.Log("cast      : " + item.CastTime);
-                        //    PluginLog.Log("clip start: " + gcdClipStart);
-                        //    PluginLog.Log("clip end  : " + gcdClipEnd.Value);
-                        //    PluginLog.Log("--------------------------------------------------");
-                        //}
-
-                        item.gcdClipData = new GCDClipData(true, gcdClipStart, gcdClipEnd, false);
+                        item.gcdClipData = new GCDClipData(true, gcdClipStart, gcdClipEnd, isFakeEnd);
                     }
                 }
             }
@@ -251,17 +240,22 @@ namespace ActionTimeline.Helpers
         {
             if (index >= _items.Count - 1) { return (null, false); }
 
+            TimelineItem? prevItem = null;
+
             for (int i = index + 1; i < _items.Count; i++)
             {
                 TimelineItem nextItem = _items[i];
                 if (nextItem.Type == TimelineItemType.Action)
                 {
-                    return (nextItem.Time, false);
+                    double time = prevItem != null && prevItem.Type == TimelineItemType.CastStart ? prevItem.Time : nextItem.Time;
+                    return (time, false);
                 }
                 else if (nextItem.Type == TimelineItemType.CastStart && i == _items.Count - 1)
                 {
                     return (nextItem.Time, true);
                 }
+
+                prevItem = nextItem;
             }
 
             return (null, false);
@@ -379,9 +373,6 @@ namespace ActionTimeline.Helpers
 
             short actionId = Marshal.ReadInt16(ptr);
             AddItem((uint)actionId, TimelineItemType.CastStart);
-
-            PluginLog.Log(GetGCDTime((uint)actionId).ToString());
-            PluginLog.Log(GetCastTime((uint)actionId).ToString());
         }
     }
 }
