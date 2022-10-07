@@ -28,7 +28,7 @@ namespace ActionTimeline.Windows
                 return;
             }
 
-            ImGui.PushItemWidth(120 * _scale);
+            ImGui.PushItemWidth(80 * _scale);
 
             // general
             if (ImGui.BeginTabItem("General##Timeline_General"))
@@ -58,6 +58,13 @@ namespace ActionTimeline.Windows
                 ImGui.EndTabItem();
             }
 
+            // gcd clipping
+            if (ImGui.BeginTabItem("GCD Clipping##Timeline_GCD"))
+            {
+                DrawGCDClippingTab();
+                ImGui.EndTabItem();
+            }
+
             ImGui.EndTabBar();
         }
 
@@ -76,6 +83,9 @@ namespace ActionTimeline.Windows
             ImGui.ColorEdit4("Unlocked Color", ref Settings.TimelineUnlockedBackgroundColor, ImGuiColorEditFlags.NoInputs);
 
             ImGui.NewLine();
+            ImGui.DragInt("Out of Combat Clear Time (seconds)", ref Settings.OutOfCombatClearTime, 0.1f, 1, 30);
+            DrawHelper.SetTooltip("The timeline will be cleared after being out of combat for this many seconds.");
+
             ImGui.Checkbox("Show Only In Duty", ref Settings.ShowTimelineOnlyInDuty);
             ImGui.Checkbox("Show Only In Combat", ref Settings.ShowTimelineOnlyInCombat);
          }
@@ -126,6 +136,32 @@ namespace ActionTimeline.Windows
             ImGui.DragInt("Sub-Division Count", ref Settings.GridSubdivisionCount, 0.5f, 2, 8);
             ImGui.DragInt("Sub-Division Line Width", ref Settings.GridSubdivisionLineWidth, 0.5f, 1, 5);
             ImGui.ColorEdit4("Sub-Division Line Color", ref Settings.GridSubdivisionLineColor, ImGuiColorEditFlags.NoInputs);
+        }
+
+        public void DrawGCDClippingTab()
+        {
+            ImGui.Checkbox("Enabled", ref Settings.ShowGCDClipping);
+
+            if (!Settings.ShowGCDClipping) { return; }
+
+            int clippingThreshold = (int)(Settings.GCDClippingThreshold * 1000f);
+            if (ImGui.DragInt("Threshold (ms)", ref clippingThreshold, 0.1f, 0, 1000))
+            {
+                Settings.GCDClippingThreshold = (float)clippingThreshold / 1000f;
+            }
+            DrawHelper.SetTooltip("This can be used filter out \"false positives\" due to latency or other factors. Any GCD clipping detected that is shorter than this value will be ignored.\nIt is strongly recommended that you test out different values and find out what works best for your setup.");
+
+            int castClippingThresgold = (int)(Settings.GCDClippingCastsThreshold * 1000f);
+            if (ImGui.DragInt("Casts Threshold (ms)", ref castClippingThresgold, 0.1f, 0, 1000))
+            {
+                Settings.GCDClippingCastsThreshold = (float)castClippingThresgold / 1000f;
+            }
+            DrawHelper.SetTooltip("This can be used filter out \"false positives\" after a cast, specially for casts that are longer than the GCD. Any GCD clipping detected after a cast that is shorter than this value will be ignored.\nIt is strongly recommended that you test out different values and find out what works best for your setup.");
+
+            ImGui.DragInt("Max Time (seconds)", ref Settings.GCDClippingMaxTime, 0.1f, 3, 60);
+            DrawHelper.SetTooltip("Any GCD clip longer than this will be capped");
+
+            ImGui.ColorEdit4("Color", ref Settings.GCDClippingColor, ImGuiColorEditFlags.NoInputs);
         }
     }
 }

@@ -10,6 +10,7 @@ namespace ActionTimeline
     {
         public bool ShowTimeline = true;
         public bool TimelineLocked = false;
+        public int OutOfCombatClearTime = 10;
         public bool ShowTimelineOnlyInDuty = false;
         public bool ShowTimelineOnlyInCombat = false;
         public int TimelineTime = 5; // seconds
@@ -22,9 +23,9 @@ namespace ActionTimeline
         public int TimelineOffGCDIconSize = 30;
         public int TimelineOffGCDOffset = -5;
 
-        public bool TimelineShowAutoAttacks = true;
-        public int TimelineAutoAttackSize = 30;
-        public int TimelineAutoAttackOffset = -5;
+        public bool TimelineShowAutoAttacks = false;
+        public int TimelineAutoAttackSize = 20;
+        public int TimelineAutoAttackOffset = 10;
 
         public Vector4 CastInProgressColor = new Vector4(0.5f, 0.5f, 0.5f, 1f);
         public Vector4 CastFinishedColor = new Vector4(0.2f, 0.8f, 0.2f, 1f);
@@ -41,6 +42,12 @@ namespace ActionTimeline
         public Vector4 GridLineColor = new Vector4(0.3f, 0.3f, 0.3f, 1f);
         public Vector4 GridSubdivisionLineColor = new Vector4(0.3f, 0.3f, 0.3f, 0.2f);
 
+        public bool ShowGCDClipping = true;
+        public float GCDClippingThreshold = 0.05f; // seconds
+        public float GCDClippingCastsThreshold = 0.5f; // seconds
+        public int GCDClippingMaxTime = 5; // seconds
+        public Vector4 GCDClippingColor = new Vector4(1f, 0.2f, 0.2f, 0.5f);
+
         public bool ShowRotation = true;
         public bool RotationLocked = false;
         public bool ShowRotationOnlyInDuty = false;
@@ -50,7 +57,7 @@ namespace ActionTimeline
         public int RotationOffGCDSpacing = 5;
 
         public bool RotationSeparatorEnabled = true;
-        public int RotationSeparatorTime = 10; //seconds
+        public int RotationSeparatorTime = 10; // seconds
         public int RotationSeparatorWidth = 3;
         public Vector4 RotationSeparatorColor = new Vector4(0.3f, 0.3f, 0.3f, 1f);
 

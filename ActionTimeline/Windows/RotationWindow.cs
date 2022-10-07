@@ -43,11 +43,15 @@ namespace ActionTimeline.Windows
             {
                 Flags |= ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove;
             }
+
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0, 0));
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
         }
 
         public override void PostDraw()
         {
             ImGui.PopStyleColor();
+            ImGui.PopStyleVar(2);
         }
 
         public override void Draw()
@@ -82,8 +86,6 @@ namespace ActionTimeline.Windows
 
                 TimelineItem item = list.ElementAt(i);
                 if (item.Type != TimelineItemType.Action && item.Type != TimelineItemType.OffGCD) { continue; }
-
-                PluginLog.Log(item.Type.ToString());
 
                 // spacing
                 if (lastValidItem != null)

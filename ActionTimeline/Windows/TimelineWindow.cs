@@ -1,6 +1,7 @@
 ﻿using ActionTimeline.Helpers;
 using Dalamud.Interface;
 using Dalamud.Interface.Windowing;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -42,11 +43,15 @@ namespace ActionTimeline.Windows
             {
                 Flags |= ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove;
             }
+
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0, 0));
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
         }
 
         public override void PostDraw()
         {
             ImGui.PopStyleColor();
+            ImGui.PopStyleVar(2);
         }
 
         public override void Draw()
@@ -64,6 +69,8 @@ namespace ActionTimeline.Windows
             IReadOnlyCollection<TimelineItem>? list = TimelineManager.Instance?.Items;
             if (list == null) { return; }
 
+            TimelineItem? lastGCD = list.LastOrDefault(o => o.Type == TimelineItemType.Action);
+
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             Vector2 pos = ImGui.GetWindowPos();
             float width = ImGui.GetWindowWidth();
@@ -75,6 +82,7 @@ namespace ActionTimeline.Windows
             Vector2 offGCDSize = new Vector2(Settings.TimelineOffGCDIconSize);
             Vector2 autoAttackSize = new Vector2(Settings.TimelineAutoAttackSize);
 
+            uint gcdClippingColor = ImGui.ColorConvertFloat4ToU32(Settings.GCDClippingColor);
             uint castInProgressColor = ImGui.ColorConvertFloat4ToU32(Settings.CastInProgressColor);
             uint castFinishedColor = ImGui.ColorConvertFloat4ToU32(Settings.CastFinishedColor);
             uint castCanceledColor = ImGui.ColorConvertFloat4ToU32(Settings.CastCanceledColor);
@@ -85,8 +93,7 @@ namespace ActionTimeline.Windows
                 if (!Settings.TimelineShowAutoAttacks && item.Type == TimelineItemType.AutoAttack) { continue; }
 
                 // position
-                double timeDiff = Math.Abs(now - item.Time);
-                float posX = width - ((float)timeDiff * width / maxTime);
+                float posX = GetPositionX(Math.Abs(now - item.Time), maxTime, width);
 
                 float posY = height / 2f;
                 if (item.Type == TimelineItemType.OffGCD) { posY += Settings.TimelineOffGCDOffset; }
@@ -97,7 +104,22 @@ namespace ActionTimeline.Windows
                 if (item.Type == TimelineItemType.OffGCD) { size = offGCDSize; }
                 else if (item.Type == TimelineItemType.AutoAttack) { size = autoAttackSize; }
 
-                Vector2 position = new Vector2(pos.X + posX, pos.Y + posY - size.Y / 2f);
+                Vector2 position = new Vector2(pos.X + posX - size.X / 2f, pos.Y + posY - size.Y / 2f);
+
+                // gcd
+                if (Settings.ShowGCDClipping && item.gcdClipData.HasValue && item.gcdClipData.Value.IsClipped)
+                {
+                    float gcdClipStartPosX = Math.Max(0, GetPositionX(Math.Abs(now - item.gcdClipData.Value.StartTime), maxTime, width));
+                    Vector2 gcdClipStartPos = new Vector2(pos.X + gcdClipStartPosX, pos.Y);
+
+                    float gcdClipEndPosX = item.gcdClipData.Value.EndTime.HasValue ? GetPositionX(Math.Abs(now - item.gcdClipData.Value.EndTime.Value), maxTime, width) : width;
+                    Vector2 gcdClipEndPos = new Vector2(pos.X + gcdClipEndPosX, pos.Y + height);
+
+                    if (gcdClipEndPosX > 0)
+                    {
+                        drawList.AddRectFilled(gcdClipStartPos, gcdClipEndPos, gcdClippingColor);
+                    }
+                }
 
                 // cast bar
                 if (item.Type == TimelineItemType.CastStart)
@@ -108,8 +130,7 @@ namespace ActionTimeline.Windows
                     if (i < list.Count - 1)
                     {
                         TimelineItem nextItem = list.ElementAt(i + 1);
-                        timeDiff = Math.Abs(now - nextItem.Time);
-                        endX = width - ((float)timeDiff * width / maxTime);
+                        endX = GetPositionX(Math.Abs(now - nextItem.Time), maxTime, width);
 
                         if (nextItem.Type == TimelineItemType.CastCancel || nextItem.ActionID != item.ActionID)
                         {
@@ -134,6 +155,18 @@ namespace ActionTimeline.Windows
                     DrawHelper.DrawIcon(item.IconID, position, size, 1, drawList);
                 }
             }
+        }
+
+        private unsafe float GetGCDTime(uint actionId)
+        {
+            ActionManager * actionManager = ActionManager.Instance();
+            uint adjustedId = actionManager->GetAdjustedActionId(actionId);
+            return actionManager->GetRecastTime(ActionType.Spell, adjustedId);
+        }
+
+        private float GetPositionX(double timeDiff, int maxTime, float width)
+        {
+            return width - ((float)timeDiff * width / maxTime);
         }
 
         private void DrawGrid()

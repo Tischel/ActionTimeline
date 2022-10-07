@@ -28,7 +28,7 @@ namespace ActionTimeline.Windows
                 return;
             }
 
-            ImGui.PushItemWidth(120 * _scale);
+            ImGui.PushItemWidth(80 * _scale);
 
             // general
             if (ImGui.BeginTabItem("General##Rotation_General"))
@@ -69,6 +69,9 @@ namespace ActionTimeline.Windows
             ImGui.ColorEdit4("Unlocked Color", ref Settings.RotationUnlockedBackgroundColor, ImGuiColorEditFlags.NoInputs);
 
             ImGui.NewLine();
+            ImGui.DragInt("Out of Combat Clear Time (seconds)", ref Settings.OutOfCombatClearTime, 0.1f, 1, 30);
+            DrawHelper.SetTooltip("The rotation will be cleared after being out of combat for this many seconds.");
+
             ImGui.Checkbox("Show Only In Duty", ref Settings.ShowRotationOnlyInDuty);
             ImGui.Checkbox("Show Only In Combat", ref Settings.ShowRotationOnlyInCombat);
         }
