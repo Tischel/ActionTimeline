@@ -33,7 +33,7 @@ namespace ActionTimeline.Helpers
         public float GCDDuration { get; }
         public float CastTime { get; }
 
-        public GCDClipData? gcdClipData = null;
+        public GCDClipData? GCDClipData = null;
 
         public TimelineItem(uint actionID, uint iconID, TimelineItemType type, double time)
         {
@@ -58,6 +58,8 @@ namespace ActionTimeline.Helpers
         public double StartTime { get; }
         public double? EndTime { get; }
         public bool IsFakeEndTime { get; }
+
+        public bool ShouldDraw => IsClipped && !Utils.UnderThreshold(StartTime, EndTime.HasValue ? EndTime.Value : ImGui.GetTime());
 
         public GCDClipData(bool isClipped, double startTime, double? endTime, bool isFakeEndTime)
         {
@@ -171,7 +173,7 @@ namespace ActionTimeline.Helpers
                 TimelineItem item = _items[i];
                 if (item.Type != TimelineItemType.Action) { continue; }
                 if (item.GCDDuration == 0) { continue; } // does this ever happen???
-                if (item.gcdClipData.HasValue && item.gcdClipData.Value.EndTime.HasValue && !item.gcdClipData.Value.IsFakeEndTime) { continue; }
+                if (item.GCDClipData.HasValue && item.GCDClipData.Value.EndTime.HasValue && !item.GCDClipData.Value.IsFakeEndTime) { continue; }
 
                 double gcdClipStart = item.Time + Math.Max(0, item.GCDDuration - item.CastTime);
 
@@ -200,14 +202,14 @@ namespace ActionTimeline.Helpers
                     }
 
                     // not clipped?
-                    if (!isFakeEnd && gcdClipEnd.HasValue && Math.Abs(gcdClipEnd.Value - gcdClipStart) < Settings.GCDClippingThreshold)
+                    if (!isFakeEnd && gcdClipEnd.HasValue && Utils.UnderThreshold(gcdClipStart, gcdClipEnd.Value))
                     {
-                        item.gcdClipData = new GCDClipData(false, 0, 0, false);
+                        item.GCDClipData = new GCDClipData(false, 0, 0, false);
                     }
                     // clipped :(
                     else
                     {
-                        item.gcdClipData = new GCDClipData(true, gcdClipStart, gcdClipEnd, isFakeEnd);
+                        item.GCDClipData = new GCDClipData(true, gcdClipStart, gcdClipEnd, isFakeEnd);
                     }
                 }
             }

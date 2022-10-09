@@ -107,12 +107,12 @@ namespace ActionTimeline.Windows
                 Vector2 position = new Vector2(pos.X + posX - size.X / 2f, pos.Y + posY - size.Y / 2f);
 
                 // gcd
-                if (Settings.ShowGCDClipping && item.gcdClipData.HasValue && item.gcdClipData.Value.IsClipped)
+                if (Settings.ShowGCDClipping && item.GCDClipData.HasValue && item.GCDClipData.Value.ShouldDraw)
                 {
-                    float gcdClipStartPosX = Math.Max(0, GetPositionX(Math.Abs(now - item.gcdClipData.Value.StartTime), maxTime, width));
+                    float gcdClipStartPosX = Math.Max(0, GetPositionX(Math.Abs(now - item.GCDClipData.Value.StartTime), maxTime, width));
                     Vector2 gcdClipStartPos = new Vector2(pos.X + gcdClipStartPosX, pos.Y);
 
-                    float gcdClipEndPosX = item.gcdClipData.Value.EndTime.HasValue ? GetPositionX(Math.Abs(now - item.gcdClipData.Value.EndTime.Value), maxTime, width) : width;
+                    float gcdClipEndPosX = item.GCDClipData.Value.EndTime.HasValue ? GetPositionX(Math.Abs(now - item.GCDClipData.Value.EndTime.Value), maxTime, width) : width;
                     Vector2 gcdClipEndPos = new Vector2(pos.X + gcdClipEndPosX, pos.Y + height);
 
                     if (gcdClipEndPosX > 0)

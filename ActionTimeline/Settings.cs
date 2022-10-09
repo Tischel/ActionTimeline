@@ -43,8 +43,8 @@ namespace ActionTimeline
         public Vector4 GridSubdivisionLineColor = new Vector4(0.3f, 0.3f, 0.3f, 0.2f);
 
         public bool ShowGCDClipping = true;
-        public float GCDClippingThreshold = 0.05f; // seconds
-        public float GCDClippingCastsThreshold = 0.5f; // seconds
+        public float GCDClippingThreshold = 0.1f; // seconds
+        public float GCDClippingCastsThreshold = 0.6f; // seconds
         public int GCDClippingMaxTime = 5; // seconds
         public Vector4 GCDClippingColor = new Vector4(1f, 0.2f, 0.2f, 0.3f);
 
