@@ -41,7 +41,7 @@ namespace ActionTimeline.Windows
 
             if (Settings.RotationLocked)
             {
-                Flags |= ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove;
+                Flags |= ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoMouseInputs;
             }
 
             ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0, 0));

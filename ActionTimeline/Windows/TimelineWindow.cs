@@ -41,7 +41,7 @@ namespace ActionTimeline.Windows
 
             if (Settings.TimelineLocked)
             {
-                Flags |= ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoInputs;
+                Flags |= ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoMouseInputs;
             }
 
             ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0, 0));

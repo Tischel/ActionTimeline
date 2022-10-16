@@ -27,13 +27,11 @@ namespace ActionTimeline.Windows
             {
                 Plugin.ShowTimelineSettingsWindow();
             }
-            DrawHelper.SetTooltip("Tip: You can right click the Timeline Window to configure it!");
 
             if (ImGui.Button("Configure Rotation Window"))
             {
                 Plugin.ShowRotationSettingsWindow();
             }
-            DrawHelper.SetTooltip("Tip: You can right click the Rotation Window to configure it!");
         }
     }
 }
