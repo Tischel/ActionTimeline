@@ -143,11 +143,34 @@ namespace ActionTimeline.Helpers
         private Hook<OnCastDelegate>? _onCastHook;
 
         private ExcelSheet<LuminaAction>? _sheet;
-        private Dictionary<uint, uint> _specialCasesMap = new() { 
+        private Dictionary<uint, uint> _specialCasesMap = new() {
+            // MNK
+            [16475] = 53, // anatman
+
             // SAM
             [16484] = 7477, // kaeshi higanbana
             [16485] = 7477, // kaeshi goken
             [16486] = 7477, // keashi setsugekka
+        };
+        private Dictionary<uint, float> _hardcodedCasesMap = new()
+        {
+            // NIN
+            [2259] = 0.5f, // ten
+            [2261] = 0.5f, // chi
+            [2263] = 0.5f, // jin
+            [18805] = 0.5f, // ten
+            [18806] = 0.5f, // chi
+            [18807] = 0.5f, // jin
+            [2265] = 1.5f, // fuma shuriken
+            [2266] = 1.5f, // katon
+            [2267] = 1.5f, // raiton
+            [2268] = 1.5f, // hyoton
+            [2269] = 1.5f, // huton
+            [2270] = 1.5f, // doton
+            [2271] = 1.5f, // suiton
+            [2272] = 1.5f, // rabbit medium
+            [16491] = 1.5f, // goka mekkyaku
+            [16492] = 1.5f, // hyosho ranryu
         };
 
         private static int kMaxItemCount = 50;
@@ -328,6 +351,13 @@ namespace ActionTimeline.Helpers
                     gcdDuration = GetGCDTime(id);
                     castTime = _hadSwiftcast ? 0 : GetCastTime(id);
                 }
+            }
+
+            // handle more weird cases
+            if (_hardcodedCasesMap.TryGetValue(actionId, out float gcd))
+            {
+                type = TimelineItemType.Action;
+                gcdDuration = gcd;
             }
 
             TimelineItem item = new TimelineItem(actionId, (uint)iconId, type, now, gcdDuration, castTime);
