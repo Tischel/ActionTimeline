@@ -5,5 +5,5 @@
   "Description": "Configurable timeline display of all the actions you use.",
   "RepoUrl": "https://github.com/Tischel/ActionTimeline",
   "Tags": [ "UI" ],
-  "Changelog": "0.2.0.0\n- Fixed windows not being click-through when locked.\n- Fixed Monk's Anatman showing as an oGCD and not triggering the GCD in the timeline.\n- Fixed Ninja's Mudras and Ninjutsus showing as an oGCD and not triggering the GCD in the timeline."
+  "Changelog": "1.0.0.0\n- Moving plugin out of testing.\n- Fixed Red Mage's Resolution not behaving correctly in the timeline with GCD clipping enabled."
 }
