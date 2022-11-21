@@ -143,7 +143,8 @@ namespace ActionTimeline.Helpers
         private Hook<OnCastDelegate>? _onCastHook;
 
         private ExcelSheet<LuminaAction>? _sheet;
-        private Dictionary<uint, uint> _specialCasesMap = new() {
+        private Dictionary<uint, uint> _specialCasesMap = new()
+        {
             // MNK
             [16475] = 53, // anatman
 
@@ -151,6 +152,9 @@ namespace ActionTimeline.Helpers
             [16484] = 7477, // kaeshi higanbana
             [16485] = 7477, // kaeshi goken
             [16486] = 7477, // keashi setsugekka
+
+            // RDM
+            [25858] = 7504 // resolution
         };
         private Dictionary<uint, float> _hardcodedCasesMap = new()
         {
