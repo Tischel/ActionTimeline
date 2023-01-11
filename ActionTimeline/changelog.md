@@ -1,3 +1,6 @@
+# 1.1.0.0
+- Added support for Patch 6.3 and Dalamud Api8.
+
 # 1.0.0.0
 - Moving plugin out of testing.
 - Fixed Red Mage's Resolution not behaving correctly in the timeline with GCD clipping enabled.
