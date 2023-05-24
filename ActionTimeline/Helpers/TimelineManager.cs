@@ -83,7 +83,8 @@ namespace ActionTimeline.Helpers
 
             try
             {
-                _onActionUsedHook = Hook<OnActionUsedDelegate>.FromAddress(Plugin.SigScanner.ScanText("4C 89 44 24 ?? 55 56 41 54 41 55 41 56"), OnActionUsed);
+                IntPtr funcPtr = Plugin.SigScanner.ScanText("40 55 53 57 41 54 41 55 41 56 41 57 48 8D AC 24 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 45 70");
+                _onActionUsedHook = Hook<OnActionUsedDelegate>.FromAddress(funcPtr, OnActionUsed);
                 _onActionUsedHook?.Enable();
 
                 _onActorControlHook = Hook<OnActorControlDelegate>.FromAddress(Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 0F B7 0B 83 E9 64"), OnActorControl);

@@ -5,5 +5,5 @@
   "Description": "Configurable timeline display of all the actions you use.",
   "RepoUrl": "https://github.com/Tischel/ActionTimeline",
   "Tags": [ "UI" ],
-  "Changelog": "1.1.0.0\n- Added support for Patch 6.3 and Dalamud Api8."
+  "Changelog": "# 1.2.0.0\n- Added support for Patch 6.4."
 }
