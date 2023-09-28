@@ -1,4 +1,6 @@
-﻿using ImGuiNET;
+﻿using Dalamud.Interface.Internal;
+using DelvUI.Helpers;
+using ImGuiNET;
 using ImGuiScene;
 using System.Numerics;
 
@@ -8,7 +10,7 @@ namespace ActionTimeline.Helpers
     {
         public static void DrawIcon(uint iconId, Vector2 position, Vector2 size, float alpha, ImDrawListPtr drawList)
         {
-            TextureWrap? texture = TexturesCache.Instance?.GetTextureFromIconId(iconId);
+            IDalamudTextureWrap? texture = TexturesHelper.GetTextureFromIconId(iconId);
             if (texture == null) return;
 
             uint color = ImGui.ColorConvertFloat4ToU32(new Vector4(1, 1, 1, alpha));

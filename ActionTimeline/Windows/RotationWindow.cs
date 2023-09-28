@@ -1,7 +1,6 @@
 ﻿using ActionTimeline.Helpers;
-using Dalamud.Interface;
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
-using Dalamud.Logging;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;

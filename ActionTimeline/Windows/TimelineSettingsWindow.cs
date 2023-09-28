@@ -1,5 +1,5 @@
 ﻿using ActionTimeline.Helpers;
-using Dalamud.Interface;
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using System.Numerics;
@@ -8,7 +8,7 @@ namespace ActionTimeline.Windows
 {
     public class TimelineSettingsWindow : Window
     {
-        private float _scale => ImGuiHelpers.GlobalScale;
+        private static float _scale => ImGuiHelpers.GlobalScale;
         private Settings Settings => Plugin.Settings;
 
         public TimelineSettingsWindow(string name) : base(name)
@@ -88,7 +88,7 @@ namespace ActionTimeline.Windows
 
             ImGui.Checkbox("Show Only In Duty", ref Settings.ShowTimelineOnlyInDuty);
             ImGui.Checkbox("Show Only In Combat", ref Settings.ShowTimelineOnlyInCombat);
-         }
+        }
 
         public void DrawIconsTab()
         {

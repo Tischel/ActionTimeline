@@ -1,8 +1,8 @@
-﻿using Dalamud.Game;
-using Dalamud.Game.ClientState.Conditions;
+﻿using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Hooking;
 using Dalamud.Logging;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiNET;
 using Lumina.Excel;
@@ -83,19 +83,27 @@ namespace ActionTimeline.Helpers
 
             try
             {
-                IntPtr funcPtr = Plugin.SigScanner.ScanText("40 55 53 57 41 54 41 55 41 56 41 57 48 8D AC 24 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 45 70");
-                _onActionUsedHook = Hook<OnActionUsedDelegate>.FromAddress(funcPtr, OnActionUsed);
+                _onActionUsedHook = Plugin.GameInteropProvider.HookFromSignature<OnActionUsedDelegate>(
+                    "40 55 53 57 41 54 41 55 41 56 41 57 48 8D AC 24 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 45 70",
+                    OnActionUsed
+                );
                 _onActionUsedHook?.Enable();
 
-                _onActorControlHook = Hook<OnActorControlDelegate>.FromAddress(Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 0F B7 0B 83 E9 64"), OnActorControl);
+                _onActorControlHook = Plugin.GameInteropProvider.HookFromSignature<OnActorControlDelegate>(
+                    "E8 ?? ?? ?? ?? 0F B7 0B 83 E9 64",
+                    OnActorControl
+                );
                 _onActorControlHook?.Enable();
 
-                _onCastHook = Hook<OnCastDelegate>.FromAddress(Plugin.SigScanner.ScanText("40 55 56 48 81 EC ?? ?? ?? ?? 48 8B EA"), OnCast);
+                _onCastHook = Plugin.GameInteropProvider.HookFromSignature<OnCastDelegate>(
+                    "40 55 56 48 81 EC ?? ?? ?? ?? 48 8B EA",
+                    OnCast
+                );
                 _onCastHook?.Enable();
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error initiating hooks: " + e.Message);
+                Plugin.Logger.Error("Error initiating hooks: " + e.Message);
             }
 
             Plugin.Framework.Update += Update;
@@ -188,7 +196,7 @@ namespace ActionTimeline.Helpers
         private bool _hadSwiftcast = false;
 
 
-        private unsafe void Update(Framework framework)
+        private unsafe void Update(IFramework framework)
         {
             double now = ImGui.GetTime();
 

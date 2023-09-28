@@ -1,33 +1,32 @@
 ﻿using ActionTimeline.Helpers;
 using ActionTimeline.Windows;
-using Dalamud.Data;
 using Dalamud.Game;
-using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Game.ClientState.Keys;
 using Dalamud.Game.Command;
-using Dalamud.Game.Gui;
 using Dalamud.Interface;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using System;
 using System.Reflection;
-using SigScanner = Dalamud.Game.SigScanner;
 
 namespace ActionTimeline
 {
     public class Plugin : IDalamudPlugin
     {
-        public static ClientState ClientState { get; private set; } = null!;
-        public static CommandManager CommandManager { get; private set; } = null!;
+        public static IClientState ClientState { get; private set; } = null!;
+        public static ICommandManager CommandManager { get; private set; } = null!;
         public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
-        public static Condition Condition { get; private set; } = null!;
-        public static DataManager DataManager { get; private set; } = null!;
-        public static Framework Framework { get; private set; } = null!;
-        public static GameGui GameGui { get; private set; } = null!;
-        public static SigScanner SigScanner { get; private set; } = null!;
+        public static ICondition Condition { get; private set; } = null!;
+        public static IDataManager DataManager { get; private set; } = null!;
+        public static IFramework Framework { get; private set; } = null!;
+        public static IGameGui GameGui { get; private set; } = null!;
+        public static ISigScanner SigScanner { get; private set; } = null!;
+        public static IGameInteropProvider GameInteropProvider { get; private set; } = null!;
         public static UiBuilder UiBuilder { get; private set; } = null!;
-        public static KeyState KeyState { get; private set; } = null!;
+        public static IKeyState KeyState { get; private set; } = null!;
+        public static IPluginLog Logger { get; private set; } = null!;
+        public static ITextureProvider TextureProvider { get; private set; } = null!;
 
         public static string AssemblyLocation { get; private set; } = "";
         public string Name => "ActionTimeline";
@@ -45,15 +44,18 @@ namespace ActionTimeline
 
 
         public Plugin(
-            ClientState clientState,
-            CommandManager commandManager,
+            IClientState clientState,
+            ICommandManager commandManager,
             DalamudPluginInterface pluginInterface,
-            Condition condition,
-            DataManager dataManager,
-            Framework framework,
-            GameGui gameGui,
-            SigScanner sigScanner,
-            KeyState keyState
+            ICondition condition,
+            IDataManager dataManager,
+            IFramework framework,
+            IGameGui gameGui,
+            ISigScanner sigScanner,
+            IGameInteropProvider gameInteropProvider,
+            IKeyState keyState,
+            IPluginLog logger,
+            ITextureProvider textureProvider
         )
         {
             ClientState = clientState;
@@ -64,8 +66,11 @@ namespace ActionTimeline
             Framework = framework;
             GameGui = gameGui;
             SigScanner = sigScanner;
+            GameInteropProvider = gameInteropProvider;
             UiBuilder = PluginInterface.UiBuilder;
             KeyState = keyState;
+            Logger = logger;
+            TextureProvider = textureProvider;
 
             if (pluginInterface.AssemblyLocation.DirectoryName != null)
             {
@@ -76,7 +81,7 @@ namespace ActionTimeline
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.2.0.0";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.3.0.0";
 
             UiBuilder.Draw += Draw;
             UiBuilder.OpenConfigUi += OpenConfigUi;
@@ -111,7 +116,6 @@ namespace ActionTimeline
                 }
             );
 
-            TexturesCache.Initialize();
             TimelineManager.Initialize();
 
             Settings = Settings.Load();
@@ -142,7 +146,7 @@ namespace ActionTimeline
 
         private void CreateWindows()
         {
-            _settingsWindow = new SettingsWindow("ActionTimeline v"+ Version);
+            _settingsWindow = new SettingsWindow("ActionTimeline v" + Version);
             _timelineSettingsWindow = new TimelineSettingsWindow("Timeline Settings");
             _rotationSettingsWindow = new RotationSettingsWindow("Rotation Settings");
             _timelineWindow = new TimelineWindow("Timeline");
@@ -228,7 +232,6 @@ namespace ActionTimeline
 
             Settings.Save(Settings);
 
-            TexturesCache.Instance?.Dispose();
             TimelineManager.Instance?.Dispose();
 
             _windowSystem.RemoveAllWindows();

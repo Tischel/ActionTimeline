@@ -86,7 +86,7 @@ namespace ActionTimeline
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error reading settings file: " + e.Message);
+                Plugin.Logger.Error("Error reading settings file: " + e.Message);
             }
 
             if (settings == null)
@@ -113,7 +113,7 @@ namespace ActionTimeline
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error saving settings file: " + e.Message);
+                Plugin.Logger.Error("Error saving settings file: " + e.Message);
             }
         }
         #endregion

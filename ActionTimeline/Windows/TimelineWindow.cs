@@ -1,5 +1,5 @@
 ﻿using ActionTimeline.Helpers;
-using Dalamud.Interface;
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiNET;
@@ -159,7 +159,7 @@ namespace ActionTimeline.Windows
 
         private unsafe float GetGCDTime(uint actionId)
         {
-            ActionManager * actionManager = ActionManager.Instance();
+            ActionManager* actionManager = ActionManager.Instance();
             uint adjustedId = actionManager->GetAdjustedActionId(actionId);
             return actionManager->GetRecastTime(ActionType.Spell, adjustedId);
         }
