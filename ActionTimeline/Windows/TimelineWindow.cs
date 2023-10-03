@@ -161,7 +161,7 @@ namespace ActionTimeline.Windows
         {
             ActionManager* actionManager = ActionManager.Instance();
             uint adjustedId = actionManager->GetAdjustedActionId(actionId);
-            return actionManager->GetRecastTime(ActionType.Spell, adjustedId);
+            return actionManager->GetRecastTime(ActionType.Action, adjustedId);
         }
 
         private float GetPositionX(double timeDiff, int maxTime, float width)

@@ -309,14 +309,14 @@ namespace ActionTimeline.Helpers
         {
             ActionManager* actionManager = ActionManager.Instance();
             uint adjustedId = actionManager->GetAdjustedActionId(actionId);
-            return actionManager->GetRecastTime(ActionType.Spell, adjustedId);
+            return actionManager->GetRecastTime(ActionType.Action, adjustedId);
         }
 
         private unsafe float GetCastTime(uint actionId)
         {
             ActionManager* actionManager = ActionManager.Instance();
             uint adjustedId = actionManager->GetAdjustedActionId(actionId);
-            return (float)ActionManager.GetAdjustedCastTime(ActionType.Spell, adjustedId) / 1000f;
+            return (float)ActionManager.GetAdjustedCastTime(ActionType.Action, adjustedId) / 1000f;
         }
 
         private void AddItem(uint actionId, TimelineItemType type)
