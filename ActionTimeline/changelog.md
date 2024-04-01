@@ -1,3 +1,7 @@
+# 1.3.0.1
+- Fixed Samurai's Kaeshi: Namikiri not showing correctly on the timeline.
+- Fixed several Ninja actions not showing correctly on the timeline.
+
 # 1.3.0.0
 - Added support for patch 6.5 and Dalamud API 9.
 

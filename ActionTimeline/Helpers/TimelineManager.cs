@@ -77,7 +77,7 @@ namespace ActionTimeline.Helpers
 
         public static TimelineManager Instance { get; private set; } = null!;
 
-        public TimelineManager()
+        private TimelineManager()
         {
             _sheet = Plugin.DataManager.GetExcelSheet<LuminaAction>();
 
@@ -161,6 +161,7 @@ namespace ActionTimeline.Helpers
             [16484] = 7477, // kaeshi higanbana
             [16485] = 7477, // kaeshi goken
             [16486] = 7477, // keashi setsugekka
+            [25782] = 7477, // kaeshi namikiri
 
             // RDM
             [25858] = 7504 // resolution
@@ -174,14 +175,26 @@ namespace ActionTimeline.Helpers
             [18805] = 0.5f, // ten
             [18806] = 0.5f, // chi
             [18807] = 0.5f, // jin
+
             [2265] = 1.5f, // fuma shuriken
+            [18873] = 1.5f, // fuma shuriken
+            [18874] = 1.5f, // fuma shuriken
+            [18875] = 1.5f, // fuma shuriken
             [2266] = 1.5f, // katon
+            [18876] = 1.5f, // katon
             [2267] = 1.5f, // raiton
+            [18877] = 1.5f, // raiton
             [2268] = 1.5f, // hyoton
+            [18878] = 1.5f, // hyoton
             [2269] = 1.5f, // huton
+            [18879] = 1.5f, // huton
             [2270] = 1.5f, // doton
+            [10892] = 1.5f, // doton
+            [18880] = 1.5f, // doton
             [2271] = 1.5f, // suiton
+            [18881] = 1.5f, // suiton
             [2272] = 1.5f, // rabbit medium
+
             [16491] = 1.5f, // goka mekkyaku
             [16492] = 1.5f, // hyosho ranryu
         };
