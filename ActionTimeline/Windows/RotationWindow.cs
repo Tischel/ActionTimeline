@@ -18,7 +18,8 @@ namespace ActionTimeline.Windows
                                             | ImGuiWindowFlags.NoCollapse
                                             | ImGuiWindowFlags.NoTitleBar
                                             | ImGuiWindowFlags.NoNav
-                                            | ImGuiWindowFlags.NoScrollWithMouse;
+                                            | ImGuiWindowFlags.NoScrollWithMouse
+                                            | ImGuiWindowFlags.NoFocusOnAppearing;
 
         public RotationWindow(string name) : base(name)
         {
