@@ -1,3 +1,6 @@
+# 1.4.0.0
+- Added support for Dawntrail and Dalamud API 10.
+
 # 1.3.0.1
 - Fixed Samurai's Kaeshi: Namikiri not showing correctly on the timeline.
 - Fixed several Ninja actions not showing correctly on the timeline.

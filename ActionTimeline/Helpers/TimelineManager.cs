@@ -84,7 +84,7 @@ namespace ActionTimeline.Helpers
             try
             {
                 _onActionUsedHook = Plugin.GameInteropProvider.HookFromSignature<OnActionUsedDelegate>(
-                    "40 55 53 57 41 54 41 55 41 56 41 57 48 8D AC 24 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 45 70",
+                    "40 ?? 56 57 41 ?? 41 ?? 41 ?? 48 ?? ?? ?? ?? ?? ?? ?? 48",
                     OnActionUsed
                 );
                 _onActionUsedHook?.Enable();
@@ -96,7 +96,7 @@ namespace ActionTimeline.Helpers
                 _onActorControlHook?.Enable();
 
                 _onCastHook = Plugin.GameInteropProvider.HookFromSignature<OnCastDelegate>(
-                    "40 55 56 48 81 EC ?? ?? ?? ?? 48 8B EA",
+                    "40 56 41 56 48 81 EC ?? ?? ?? ?? 48 8B F2",
                     OnCast
                 );
                 _onCastHook?.Enable();
@@ -286,7 +286,7 @@ namespace ActionTimeline.Helpers
 
         private void CheckSwiftcast()
         {
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player != null)
             {
                 _hadSwiftcast = player.StatusList.Any(s => s.StatusId == 167);
@@ -414,12 +414,14 @@ namespace ActionTimeline.Helpers
         {
             _onActionUsedHook?.Original(sourceId, sourceCharacter, pos, effectHeader, effectArray, effectTrail);
 
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
-            if (player == null || sourceId != player.ObjectId) { return; }
+            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            if (player == null || sourceId != player.GameObjectId) { return; }
 
             int actionId = Marshal.ReadInt32(effectHeader, 0x8);
             TimelineItemType? type = TypeForActionID((uint)actionId);
             if (!type.HasValue) { return; }
+
+            Plugin.Logger.Debug($"Action {actionId} {type.ToString()}");
 
             AddItem((uint)actionId, type.Value);
         }
@@ -430,8 +432,8 @@ namespace ActionTimeline.Helpers
 
             if (type != 15) { return; }
 
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
-            if (player == null || entityId != player.ObjectId) { return; }
+            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            if (player == null || entityId != player.GameObjectId) { return; }
 
             AddItem(actionId, TimelineItemType.CastCancel);
         }
@@ -440,11 +442,13 @@ namespace ActionTimeline.Helpers
         {
             _onCastHook?.Original(sourceId, ptr);
 
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
-            if (player == null || sourceId != player.ObjectId) { return; }
+            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            if (player == null || sourceId != player.GameObjectId) { return; }
 
-            short actionId = Marshal.ReadInt16(ptr);
-            AddItem((uint)actionId, TimelineItemType.CastStart);
+            int value = Marshal.ReadInt16(ptr);
+            uint actionId = value < 0 ? (uint)(value + 65536) : (uint)value;
+
+            AddItem(actionId, TimelineItemType.CastStart);
         }
     }
 }

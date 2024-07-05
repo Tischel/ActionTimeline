@@ -1,7 +1,7 @@
 ﻿using ActionTimeline;
-using Dalamud.Interface.Internal;
+using Dalamud.Interface.Textures;
+using Dalamud.Interface.Textures.TextureWraps;
 using Lumina.Excel;
-using static Dalamud.Plugin.Services.ITextureProvider;
 
 namespace DelvUI.Helpers
 {
@@ -26,12 +26,13 @@ namespace DelvUI.Helpers
 
         public static IDalamudTextureWrap? GetTextureFromIconId(uint iconId, uint stackCount = 0, bool hdIcon = true)
         {
-            return Plugin.TextureProvider.GetIcon(iconId + stackCount, hdIcon ? IconFlags.HiRes : IconFlags.None);
+            GameIconLookup lookup = new GameIconLookup(iconId + stackCount, false, hdIcon);
+            return Plugin.TextureProvider.GetFromGameIcon(lookup).GetWrapOrDefault();
         }
 
         public static IDalamudTextureWrap? GetTextureFromPath(string path)
         {
-            return Plugin.TextureProvider.GetTextureFromGame(path);
+            return Plugin.TextureProvider.GetFromGame(path).GetWrapOrDefault();
         }
     }
 }

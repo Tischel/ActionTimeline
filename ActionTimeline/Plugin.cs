@@ -16,14 +16,14 @@ namespace ActionTimeline
     {
         public static IClientState ClientState { get; private set; } = null!;
         public static ICommandManager CommandManager { get; private set; } = null!;
-        public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
+        public static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
         public static ICondition Condition { get; private set; } = null!;
         public static IDataManager DataManager { get; private set; } = null!;
         public static IFramework Framework { get; private set; } = null!;
         public static IGameGui GameGui { get; private set; } = null!;
         public static ISigScanner SigScanner { get; private set; } = null!;
         public static IGameInteropProvider GameInteropProvider { get; private set; } = null!;
-        public static UiBuilder UiBuilder { get; private set; } = null!;
+        public static IUiBuilder UiBuilder { get; private set; } = null!;
         public static IKeyState KeyState { get; private set; } = null!;
         public static IPluginLog Logger { get; private set; } = null!;
         public static ITextureProvider TextureProvider { get; private set; } = null!;
@@ -46,7 +46,7 @@ namespace ActionTimeline
         public Plugin(
             IClientState clientState,
             ICommandManager commandManager,
-            DalamudPluginInterface pluginInterface,
+            IDalamudPluginInterface pluginInterface,
             ICondition condition,
             IDataManager dataManager,
             IFramework framework,
@@ -81,7 +81,7 @@ namespace ActionTimeline
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.3.0.1";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.4.0.0";
 
             UiBuilder.Draw += Draw;
             UiBuilder.OpenConfigUi += OpenConfigUi;
@@ -242,7 +242,7 @@ namespace ActionTimeline
 
             UiBuilder.Draw -= Draw;
             UiBuilder.OpenConfigUi -= OpenConfigUi;
-            UiBuilder.RebuildFonts();
+            UiBuilder.FontAtlas.BuildFontsAsync();
         }
     }
 }

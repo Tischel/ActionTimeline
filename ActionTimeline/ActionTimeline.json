@@ -5,5 +5,5 @@
   "Description": "Configurable timeline display of all the actions you use.",
   "RepoUrl": "https://github.com/Tischel/ActionTimeline",
   "Tags": [ "UI" ],
-  "Changelog": "# 1.3.0.1\n\n- Fixed Samurai's Kaeshi: Namikiri not showing correctly on the timeline.\n- Fixed several Ninja actions not showing correctly on the timeline."
+  "Changelog": "# 1.4.0.0\n\n- Added support for Dawntrail and Dalamud API 10."
 }
