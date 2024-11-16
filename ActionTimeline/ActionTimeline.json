@@ -5,5 +5,5 @@
   "Description": "Configurable timeline display of all the actions you use.",
   "RepoUrl": "https://github.com/Tischel/ActionTimeline",
   "Tags": [ "UI" ],
-  "Changelog": "# 1.4.0.0\n\n- Added support for Dawntrail and Dalamud API 10."
+  "Changelog": "# 1.5.0.0\n\n- Added support for Patch 7.1 and Dalamud API 11.\n- Added support for items."
 }

@@ -84,7 +84,7 @@ namespace ActionTimeline.Windows
                 if (posX < -50) { break; }
 
                 TimelineItem item = list.ElementAt(i);
-                if (item.Type != TimelineItemType.Action && item.Type != TimelineItemType.OffGCD) { continue; }
+                if (item.Type != TimelineItemType.Action && item.Type != TimelineItemType.OffGCD && item.Type != TimelineItemType.Item) { continue; }
 
                 // spacing
                 if (lastValidItem != null)

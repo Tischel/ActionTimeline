@@ -96,12 +96,12 @@ namespace ActionTimeline.Windows
                 float posX = GetPositionX(Math.Abs(now - item.Time), maxTime, width);
 
                 float posY = height / 2f;
-                if (item.Type == TimelineItemType.OffGCD) { posY += Settings.TimelineOffGCDOffset; }
+                if (item.Type == TimelineItemType.OffGCD || item.Type == TimelineItemType.Item) { posY += Settings.TimelineOffGCDOffset; }
                 else if (item.Type == TimelineItemType.AutoAttack) { posY += Settings.TimelineAutoAttackOffset; }
 
                 // size
                 Vector2 size = regularSize;
-                if (item.Type == TimelineItemType.OffGCD) { size = offGCDSize; }
+                if (item.Type == TimelineItemType.OffGCD || item.Type == TimelineItemType.Item) { size = offGCDSize; }
                 else if (item.Type == TimelineItemType.AutoAttack) { size = autoAttackSize; }
 
                 Vector2 position = new Vector2(pos.X + posX - size.X / 2f, pos.Y + posY - size.Y / 2f);

@@ -1,16 +1,17 @@
 ﻿using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Hooking;
-using Dalamud.Logging;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using ImGuiNET;
 using Lumina.Excel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using LuminaAction = Lumina.Excel.GeneratedSheets.Action;
+using LuminaAction = Lumina.Excel.Sheets.Action;
+using LuminaItem = Lumina.Excel.Sheets.Item;
 
 namespace ActionTimeline.Helpers
 {
@@ -20,7 +21,8 @@ namespace ActionTimeline.Helpers
         CastStart = 1,
         CastCancel = 2,
         OffGCD = 3,
-        AutoAttack = 4
+        AutoAttack = 4,
+        Item = 5
     }
 
     public class TimelineItem
@@ -79,7 +81,8 @@ namespace ActionTimeline.Helpers
 
         private TimelineManager()
         {
-            _sheet = Plugin.DataManager.GetExcelSheet<LuminaAction>();
+            _actionSheet = Plugin.DataManager.GetExcelSheet<LuminaAction>();
+            _itemSheet = Plugin.DataManager.GetExcelSheet<LuminaItem>();
 
             try
             {
@@ -151,7 +154,9 @@ namespace ActionTimeline.Helpers
         private delegate void OnCastDelegate(uint sourceId, IntPtr sourceCharacter);
         private Hook<OnCastDelegate>? _onCastHook;
 
-        private ExcelSheet<LuminaAction>? _sheet;
+        private ExcelSheet<LuminaAction>? _actionSheet;
+        private ExcelSheet<LuminaItem>? _itemSheet;
+
         private Dictionary<uint, uint> _specialCasesMap = new()
         {
             // MNK
@@ -332,10 +337,16 @@ namespace ActionTimeline.Helpers
             return (float)ActionManager.GetAdjustedCastTime(ActionType.Action, adjustedId) / 1000f;
         }
 
-        private void AddItem(uint actionId, TimelineItemType type)
+        private void Add(uint id, TimelineItemType type)
         {
-            LuminaAction? action = _sheet?.GetRow(actionId);
-            if (action == null) { return; }
+            if (type == TimelineItemType.Item) 
+            {
+                AddItem(id);
+                return;
+            }
+
+            LuminaAction? action = _actionSheet?.GetRowOrDefault(id);
+            if (action == null || !action.HasValue) { return; }
 
             // only cache the last kMaxItemCount items
             if (_items.Count >= kMaxItemCount)
@@ -348,21 +359,21 @@ namespace ActionTimeline.Helpers
             float castTime = 0;
 
             // handle sprint and auto attack icons
-            int iconId = actionId == 3 ? 104 : (actionId == 1 ? 101 : action.Icon);
+            int iconId = id == 3 ? 104 : (id == 1 ? 101 : action.Value.Icon);
 
             // handle weird cases
-            uint id = actionId;
-            if (_specialCasesMap.TryGetValue(actionId, out uint replacedId))
+            uint _id = id;
+            if (_specialCasesMap.TryGetValue(id, out uint replacedId))
             {
                 type = TimelineItemType.Action;
-                id = replacedId;
+                _id = replacedId;
             }
 
             // calculate gcd and cast time
             if (type == TimelineItemType.CastStart)
             {
-                gcdDuration = GetGCDTime(id);
-                castTime = GetCastTime(id);
+                gcdDuration = GetGCDTime(_id);
+                castTime = GetCastTime(_id);
             }
             else if (type == TimelineItemType.Action)
             {
@@ -374,34 +385,70 @@ namespace ActionTimeline.Helpers
                 }
                 else
                 {
-                    gcdDuration = GetGCDTime(id);
-                    castTime = _hadSwiftcast ? 0 : GetCastTime(id);
+                    gcdDuration = GetGCDTime(_id);
+                    castTime = _hadSwiftcast ? 0 : GetCastTime(_id);
                 }
             }
 
             // handle more weird cases
-            if (_hardcodedCasesMap.TryGetValue(actionId, out float gcd))
+            if (_hardcodedCasesMap.TryGetValue(id, out float gcd))
             {
                 type = TimelineItemType.Action;
                 gcdDuration = gcd;
             }
 
-            TimelineItem item = new TimelineItem(actionId, (uint)iconId, type, now, gcdDuration, castTime);
+            TimelineItem item = new TimelineItem(id, (uint)iconId, type, now, gcdDuration, castTime);
             _items.Add(item);
         }
 
-        private TimelineItemType? TypeForActionID(uint actionId)
+        private void AddItem(uint id)
         {
-            LuminaAction? action = _sheet?.GetRow(actionId);
-            if (action == null) { return null; }
+            LuminaItem? item = _itemSheet?.GetRowOrDefault(id) ?? _itemSheet?.GetRowOrDefault(id - 1000000);
+            if (item == null || !item.HasValue) { return; }
 
+            // only cache the last kMaxItemCount items
+            if (_items.Count >= kMaxItemCount)
+            {
+                _items.RemoveAt(0);
+            }
+
+            TimelineItem i = new TimelineItem(
+                id, 
+                item.Value.Icon, 
+                TimelineItemType.Item,
+                ImGui.GetTime(), 
+                0,
+                0
+            );
+            _items.Add(i);
+        }
+
+        private TimelineItemType? TypeForID(uint id)
+        {
+            LuminaAction? action = _actionSheet?.GetRowOrDefault(id);
+            if (action != null)
+            {
+                return TypeForAction(action.Value);
+            }
+
+            LuminaItem? item = _itemSheet?.GetRowOrDefault(id) ?? _itemSheet?.GetRowOrDefault(id - 1000000);
+            if (item != null)
+            {
+                return TimelineItemType.Item;
+            }
+
+            return TimelineItemType.Action;
+        }
+
+        private TimelineItemType TypeForAction(LuminaAction action)
+        {
             // off gcd or sprint
-            if (action.ActionCategory.Row is 4 || actionId == 3)
+            if (action.ActionCategory.RowId is 4 || action.RowId == 3)
             {
                 return TimelineItemType.OffGCD;
             }
 
-            if (action.ActionCategory.Row is 1)
+            if (action.ActionCategory.RowId is 1)
             {
                 return TimelineItemType.AutoAttack;
             }
@@ -414,16 +461,14 @@ namespace ActionTimeline.Helpers
         {
             _onActionUsedHook?.Original(sourceId, sourceCharacter, pos, effectHeader, effectArray, effectTrail);
 
-            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter ? player = Plugin.ClientState.LocalPlayer;
             if (player == null || sourceId != player.GameObjectId) { return; }
 
             int actionId = Marshal.ReadInt32(effectHeader, 0x8);
-            TimelineItemType? type = TypeForActionID((uint)actionId);
+            TimelineItemType? type = TypeForID((uint)actionId);
             if (!type.HasValue) { return; }
 
-            Plugin.Logger.Debug($"Action {actionId} {type.ToString()}");
-
-            AddItem((uint)actionId, type.Value);
+            Add((uint)actionId, type.Value);
         }
 
         private void OnActorControl(uint entityId, uint type, uint buffID, uint direct, uint actionId, uint sourceId, uint arg4, uint arg5, ulong targetId, byte a10)
@@ -435,7 +480,7 @@ namespace ActionTimeline.Helpers
             IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player == null || entityId != player.GameObjectId) { return; }
 
-            AddItem(actionId, TimelineItemType.CastCancel);
+            Add(actionId, TimelineItemType.CastCancel);
         }
 
         private void OnCast(uint sourceId, IntPtr ptr)
@@ -448,7 +493,7 @@ namespace ActionTimeline.Helpers
             int value = Marshal.ReadInt16(ptr);
             uint actionId = value < 0 ? (uint)(value + 65536) : (uint)value;
 
-            AddItem(actionId, TimelineItemType.CastStart);
+            Add(actionId, TimelineItemType.CastStart);
         }
     }
 }
