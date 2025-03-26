@@ -81,7 +81,7 @@ namespace ActionTimeline
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.5.0.0";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.6.0.0";
 
             UiBuilder.Draw += Draw;
             UiBuilder.OpenConfigUi += OpenConfigUi;

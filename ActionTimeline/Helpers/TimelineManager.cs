@@ -3,13 +3,17 @@ using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Hooking;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using ImGuiNET;
 using Lumina.Excel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices;
+using static FFXIVClientStructs.FFXIV.Client.Game.Character.ActionEffectHandler;
 using LuminaAction = Lumina.Excel.Sheets.Action;
 using LuminaItem = Lumina.Excel.Sheets.Item;
 
@@ -79,15 +83,15 @@ namespace ActionTimeline.Helpers
 
         public static TimelineManager Instance { get; private set; } = null!;
 
-        private TimelineManager()
+        private unsafe TimelineManager()
         {
             _actionSheet = Plugin.DataManager.GetExcelSheet<LuminaAction>();
             _itemSheet = Plugin.DataManager.GetExcelSheet<LuminaItem>();
 
             try
             {
-                _onActionUsedHook = Plugin.GameInteropProvider.HookFromSignature<OnActionUsedDelegate>(
-                    "40 ?? 56 57 41 ?? 41 ?? 41 ?? 48 ?? ?? ?? ?? ?? ?? ?? 48",
+                _onActionUsedHook = Plugin.GameInteropProvider.HookFromAddress<ActionEffectHandler.Delegates.Receive>(
+                    ActionEffectHandler.MemberFunctionPointers.Receive,
                     OnActionUsed
                 );
                 _onActionUsedHook?.Enable();
@@ -145,8 +149,7 @@ namespace ActionTimeline.Helpers
         }
         #endregion
 
-        private delegate void OnActionUsedDelegate(uint sourceId, IntPtr sourceCharacter, IntPtr pos, IntPtr effectHeader, IntPtr effectArray, IntPtr effectTrail);
-        private Hook<OnActionUsedDelegate>? _onActionUsedHook;
+        private Hook<ActionEffectHandler.Delegates.Receive>? _onActionUsedHook;
 
         private delegate void OnActorControlDelegate(uint entityId, uint id, uint unk1, uint type, uint unk2, uint unk3, uint unk4, uint unk5, UInt64 targetId, byte unk6);
         private Hook<OnActorControlDelegate>? _onActorControlHook;
@@ -456,19 +459,18 @@ namespace ActionTimeline.Helpers
             return TimelineItemType.Action;
         }
 
-        private void OnActionUsed(uint sourceId, IntPtr sourceCharacter, IntPtr pos, IntPtr effectHeader,
-            IntPtr effectArray, IntPtr effectTrail)
+        private unsafe void OnActionUsed(uint actorId, Character* casterPtr, Vector3* targetPos, Header* header, TargetEffects* effects, GameObjectId* targetEntityIds)
         {
-            _onActionUsedHook?.Original(sourceId, sourceCharacter, pos, effectHeader, effectArray, effectTrail);
+            _onActionUsedHook?.Original(actorId, casterPtr, targetPos, header, effects, targetEntityIds);
 
             IPlayerCharacter ? player = Plugin.ClientState.LocalPlayer;
-            if (player == null || sourceId != player.GameObjectId) { return; }
+            if (player == null || actorId != player.GameObjectId) { return; }
 
-            int actionId = Marshal.ReadInt32(effectHeader, 0x8);
-            TimelineItemType? type = TypeForID((uint)actionId);
+            uint actionId = header->ActionId;
+            TimelineItemType? type = TypeForID(actionId);
             if (!type.HasValue) { return; }
 
-            Add((uint)actionId, type.Value);
+            Add(actionId, type.Value);
         }
 
         private void OnActorControl(uint entityId, uint type, uint buffID, uint direct, uint actionId, uint sourceId, uint arg4, uint arg5, ulong targetId, byte a10)
