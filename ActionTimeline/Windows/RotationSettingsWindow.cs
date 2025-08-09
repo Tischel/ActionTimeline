@@ -1,7 +1,7 @@
 ﻿using ActionTimeline.Helpers;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System.Numerics;
 
 namespace ActionTimeline.Windows
