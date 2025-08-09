@@ -1,6 +1,6 @@
 ﻿using Dalamud.Interface.Textures.TextureWraps;
 using DelvUI.Helpers;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System.Numerics;
 
 namespace ActionTimeline.Helpers
@@ -13,7 +13,7 @@ namespace ActionTimeline.Helpers
             if (texture == null) return;
 
             uint color = ImGui.ColorConvertFloat4ToU32(new Vector4(1, 1, 1, alpha));
-            drawList.AddImage(texture.ImGuiHandle, position, position + size, Vector2.Zero, Vector2.One, color);
+            drawList.AddImage(texture.Handle, position, position + size, Vector2.Zero, Vector2.One, color);
         }
 
         public static void SetTooltip(string message)

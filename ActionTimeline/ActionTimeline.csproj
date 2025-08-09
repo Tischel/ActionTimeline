@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Dalamud.NET.Sdk/13.0.0">
 	<PropertyGroup Label="Target">
 		<PlatformTarget>x64</PlatformTarget>
 		<TargetFramework>net9.0</TargetFramework>
@@ -34,22 +34,6 @@
 	<!-- Release Configuration -->
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<Deterministic>true</Deterministic>
-	</PropertyGroup>
-
-	<!-- Dalamud Configuration -->
-	<PropertyGroup>
-        <DalamudVersion>dev</DalamudVersion>
-        <DalamudLocal>../dalamud/</DalamudLocal>
-        <DalamudLibPath>$(APPDATA)\XIVLauncher\addon\Hooks\$(DalamudVersion)\</DalamudLibPath>
-	</PropertyGroup>
-
-	<!-- Assembly Reference Locations -->
-	<PropertyGroup>
-		<AssemblySearchPaths>
-			$(AssemblySearchPaths);
-			$(DalamudLocal);
-			$(DalamudLibPath);
-		</AssemblySearchPaths>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -98,9 +82,4 @@
             <Private>false</Private>
         </Reference>
     </ItemGroup>
-
-	<!-- NuGet Packages -->
-	<ItemGroup>
-		<PackageReference Include="DalamudPackager" Version="12.0.0" />
-	</ItemGroup>
 </Project>
